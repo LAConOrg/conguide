@@ -1,3 +1,10 @@
+# How to use locally
+Note: these should all be run from the base directory
+1. `python3 -m venv .venv`
+2. `source .venv/bin/activate`
+3. `pip3 install -r requirements.txt`
+4. `pip3 install setuptools`
+
 # How to use with planorama - a24 edition
 
 1. Install the dependencies into a venv - they are in requirements.txt
