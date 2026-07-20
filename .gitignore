@@ -1,2 +1,6 @@
 build/
 dist/
+.venv
+
+conguide.egg-info
+*.jsonp
