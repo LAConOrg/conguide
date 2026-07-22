@@ -19,7 +19,7 @@
 """A front-end driver module to generate Convention Guide content.
 
 | usage: conguide.py [-?] [-c CFG] [-d] [-q] [-t] [-h] [-x] [-i] [-a]
-| 
+|
 | optional arguments:
 |   -?, --help            show this help message and exit
 |   -c CFG, --config CFG  config file (default "arisia.cfg")
@@ -42,13 +42,31 @@ import os
 import sys
 import time
 
-from . import config, bios, featured, grid, output, participant, schedule, session, \
-    tracks, xref, guidebook, count, changes, problems, backup, dup, overnight, \
-    parserhelp
+from . import (
+    backup,
+    bios,
+    changes,
+    config,
+    count,
+    dup,
+    featured,
+    grid,
+    guidebook,
+    output,
+    overnight,
+    parserhelp,
+    participant,
+    problems,
+    schedule,
+    session,
+    tracks,
+    xref,
+)
 from .__init__ import __prog__, __version__
 
 # search the working directory for [input file importer]
-sys.path[0:0] = '.'
+sys.path[0:0] = "."
+
 
 def all_reports(args):
     # generate all reports
@@ -62,19 +80,23 @@ def all_reports(args):
     bios.main(args)
     if args.xml:
         try:
-            f = codecs.open(config.get('output files xml', 'conguide'),
-                            'w', 'utf-8', 'replace')
+            f = codecs.open(
+                config.get("output files xml", "conguide"), "w", "utf-8", "replace"
+            )
         except KeyError:
             pass
         else:
-            (sessions, participants) = session.read(config.get('input files', 'schedule'))
+            (sessions, participants) = session.read(
+                config.get("input files", "schedule")
+            )
             f.write('<?xml version="1.0" encoding="UTF-8"?>\n<conguide>\n')
             schedule.write(schedule.XmlOutput(None, f), sessions)
             featured.write(featured.XmlOutput(None, f), sessions)
             tracks.write(tracks.XmlOutput(None, f), sessions)
             xref.write(xref.XmlOutput(None, f), participants)
-            f.write('</conguide>\n')
+            f.write("</conguide>\n")
             f.close()
+
 
 def main():
     # command line
@@ -83,16 +105,26 @@ def main():
     subparsers = parser.add_subparsers()
 
     # global options
-    parser.add_argument('-?', '--help', action='help',
-                        help='show this help message and exit')
-    parser.add_argument('--version', action='version', version='%(prog)s ' + __version__)
-    parser.add_argument('-c', '--config', dest='cfg', default=config.CFG,
-                        help='config file (default "%s")' % config.CFG)
-    parser.add_argument('-d', '--debug', action='store_true',
-                        help='add debugging/trace information')
-    parser.add_argument('-q', '--quiet', action='store_true',
-                        help='suppress warning messages')
- 
+    parser.add_argument(
+        "-?", "--help", action="help", help="show this help message and exit"
+    )
+    parser.add_argument(
+        "--version", action="version", version="%(prog)s " + __version__
+    )
+    parser.add_argument(
+        "-c",
+        "--config",
+        dest="cfg",
+        default=config.CFG,
+        help='config file (default "%s")' % config.CFG,
+    )
+    parser.add_argument(
+        "-d", "--debug", action="store_true", help="add debugging/trace information"
+    )
+    parser.add_argument(
+        "-q", "--quiet", action="store_true", help="suppress warning messages"
+    )
+
     # subcommand-specific options
     schedule.add_args(subparsers)
     xref.add_args(subparsers)
@@ -102,9 +134,10 @@ def main():
     bios.add_args(subparsers)
 
     # all of the previous reports at once
-    parser_all = subparsers.add_parser('all', add_help=False,
-                                        help='generate all reports')
-    parserhelp.add_modes(parser_all, ['t', 'h', 'x', 'i', 'a'])
+    parser_all = subparsers.add_parser(
+        "all", add_help=False, help="generate all reports"
+    )
+    parserhelp.add_modes(parser_all, ["t", "h", "x", "i", "a"])
     parserhelp.add_io(parser_all)
     parser_all.set_defaults(func=all_reports)
 
@@ -125,13 +158,15 @@ def main():
     config.cfgfile = args.cfg
 
     try:
-        fn = args.infile or config.get('input files', 'schedule')
+        fn = args.infile or config.get("input files", "schedule")
     except AttributeError:
-        fn = config.get('input files', 'schedule')
+        fn = config.get("input files", "schedule")
+
     config.source_date = time.ctime(os.path.getmtime(fn))
 
     # run the subcommand
     args.func(args)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     sys.exit(main())
