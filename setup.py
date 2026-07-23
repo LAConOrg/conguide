@@ -34,8 +34,8 @@ setup(
     url='https://github.com/pselkirk/conguide',
 
     # Author details
-    author='Paul Selkirk',
-    author_email='paul@psgd.org',
+    author='Paul Selkirk, Gail Terman',
+    author_email='paul@psgd.org, gterman@gmail.com',
 
     # Choose your license
     # I like this one because it's concise and permissive (1-clause BSD),
@@ -59,10 +59,8 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.12',
 
         # other classifiers
         'Environment :: Console',

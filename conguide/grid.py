@@ -735,7 +735,7 @@ def main(args):
                 write(outfunc(args.outfile), sessions)
             else:
                 try:
-                    write(outfunc(config.get('output files ' + mode, 'grid')),
+                    write(outfunc(f"{config.get('output directory', 'directory', '.')}/{config.get('output files ' + mode, 'grid')}"),
                           sessions)
                 except config.NoOptionError:
                     pass

@@ -204,6 +204,8 @@ class XmlOutput(Output):
 def write(output, sessions):
     tracks = {}
     for session in sessions:
+        if not hasattr(session, 'track'):
+            continue
         t = session.track
         if not t:
             continue
@@ -242,7 +244,7 @@ def main(args):
                 write(outfunc(args.outfile), sessions)
             else:
                 try:
-                    write(outfunc(config.get('output files ' + mode, 'tracks')),
+                    write(outfunc(f"{config.get('output directory', 'directory', '.')}/{config.get('output files ' + mode, 'tracks')}"),
                           sessions)
                 except config.NoOptionError:
                     pass

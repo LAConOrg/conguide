@@ -20,9 +20,6 @@ import argparse
 
 from . import config, session
 
-if not config.PY3:
-    str = unicode
-
 def changes(args):
     if len(args.files) == 1:
         args.files.append(config.get('input files', 'schedule'))

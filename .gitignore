@@ -4,3 +4,6 @@ dist/
 
 conguide.egg-info
 *.jsonp
+
+lacon/output
+lacon/*.json
