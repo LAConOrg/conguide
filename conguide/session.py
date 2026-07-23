@@ -195,7 +195,7 @@ class Session(object):
             pass
 
     def __lt__(self, other):
-        return (other and \
+        return (hasattr(self, 'time') and other and hasattr(other, 'time') and \
                 ((self.time.day < other.time.day) or \
                  ((self.time.day == other.time.day) and \
                   ((self.time < other.time) or \
@@ -219,7 +219,7 @@ def read(fn, reset=False):
     value = config.get('input file importer', 'reader')
     try:
         filereader = importlib.import_module(value)
-    except ImportError:
+    except ImportError as e:
         filereader = importlib.import_module('conguide.' + value)
     if reset:
         filereader.sessions = []

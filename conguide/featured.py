@@ -160,6 +160,8 @@ def write(output, sessions):
     # build the 'sessions' list. Or even add a 'featured' attribute to the
     # session.
     for s in sessions:
+        if not hasattr(s, 'sessionid'):
+            continue
         if s.sessionid in Output.featured:
             if s.time.day != curday:
                 nextday = s
@@ -234,7 +236,7 @@ def main(args):
                     write(outfunc(args.outfile), sessions)
                 else:
                     try:
-                        write(outfunc(config.get('output files ' + mode, 'featured')),
+                        write(outfunc(f"{config.get('output directory', 'directory', '.')}/{config.get('output files ' + mode, 'featured')}"),
                               sessions)
                     except config.NoOptionError:
                         pass

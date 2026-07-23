@@ -18,17 +18,11 @@
 
 """ Global variables and config file parsing. """
 
-import re
-import sys
-PY3 = sys.version > '3'
-
-if not PY3:
-    import codecs
-    sys.stdout = codecs.getwriter('utf8')(sys.stdout)
-    sys.stderr = codecs.getwriter('utf8')(sys.stderr)
-
 # default config file
 CFG = 'conguide.cfg'
+
+# default output dir
+OUTDIR = '.'
 # TODO: If there is exactly one .cfg file in the working directory, use
 # that by default.
 
@@ -66,57 +60,35 @@ div.center {text-align:center}\n\
 </div>\n'
 source_date = ''
 
-if PY3:
-    import configparser
-else:
-    import ConfigParser as configparser
-    class MyConfigParser(configparser.SafeConfigParser):
-        """ Py2 ConfigParser does not support inline comments starting with '#'. """
+import configparser
 
-        def __init__(self):
-            """ Allow options without values, and don't lower-case option names. """
-            configparser.SafeConfigParser.__init__(self, allow_no_value=True)
-            self.optionxform = lambda s: s
+cfg: configparser.ConfigParser | None = None
 
-        def get(self, section, option):
-            value = configparser.SafeConfigParser.get(self, section, option)
-            return re.sub(r'\s*#.*', '', value)
-
-        def items(self, section):
-            list = configparser.ConfigParser.items(self, section)
-            for i, (name, value) in enumerate(list):
-                name = re.sub(r'\s*#.*', '', name)
-                value = re.sub(r'\s*#.*', '', value)
-                list[i] = (name, value)
-            return list
-
-cfg = None
-
-def readConfig(fn):
+def readConfig(fn) -> configparser.ConfigParser:
     global cfg
     if not cfg:
-        if PY3:
-            cfg = configparser.ConfigParser(allow_no_value=True, strict=False,
-                                            inline_comment_prefixes=('#',))
-            cfg.optionxform = lambda s: s
-            with open(fn, 'r', encoding='utf-8') as f:
-                cfg.readfp(f)
-        else:
-            cfg = MyConfigParser()
-            with codecs.open(fn, 'r', 'utf-8') as f:
-                cfg.readfp(f)
+        cfg = configparser.ConfigParser(allow_no_value=True, strict=False,
+                                        inline_comment_prefixes=('#',))
+        cfg.optionxform = lambda optionstr: optionstr
+        with open(fn, 'r', encoding='utf-8') as f:
+            cfg.read_file(f)
+    return cfg
 
-def get(section, option):
-    readConfig(cfgfile)
+def get(section, option, default = None):
+    cfg = readConfig(cfgfile)
     try:
         return cfg.get(section, option)
     except configparser.NoSectionError as e:
+        if default:
+            return default
         raise NoSectionError(e)
     except configparser.NoOptionError as e:
+        if default:
+            return default
         raise NoOptionError(e)
 
 def getboolean(section, option):
-    readConfig(cfgfile)
+    cfg = readConfig(cfgfile)
     try:
         return cfg.getboolean(section, option)
     except configparser.NoSectionError as e:
@@ -125,7 +97,7 @@ def getboolean(section, option):
         raise NoOptionError(e)
 
 def getfloat(section, option):
-    readConfig(cfgfile)
+    cfg = readConfig(cfgfile)
     try:
         return cfg.getfloat(section, option)
     except configparser.NoSectionError as e:
@@ -134,14 +106,14 @@ def getfloat(section, option):
         raise NoOptionError(e)
 
 def items(section):
-    readConfig(cfgfile)
+    cfg = readConfig(cfgfile)
     try:
         return cfg.items(section)
     except configparser.NoSectionError as e:
         raise NoSectionError(e)
 
 def itemdict(section):
-    readConfig(cfgfile)
+    cfg = readConfig(cfgfile)
     try:
         dd = {}
         for key, value in cfg.items(section):
@@ -151,18 +123,17 @@ def itemdict(section):
         raise NoSectionError(e)
 
 def sections():
-    readConfig(cfgfile)
+    cfg = readConfig(cfgfile)
     return cfg.sections()
 
 def set(section, option, value):
-    readConfig(cfgfile)
+    cfg = readConfig(cfgfile)
     try:
         cfg.set(section, option, value)
     except configparser.NoSectionError as e:
         raise NoSectionError(e)
 
-# exception classes, so callers don't have to know about configparser
-# (or ConfigParser)
+# # exception classes, so callers don't have to know about configparser
 class NoSectionError(configparser.NoSectionError):
     def __init__(self, value):
         self.value = value

@@ -20,6 +20,7 @@
 from functools import reduce
 import json
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 from . import config
 from .participant import Participant
@@ -42,6 +43,13 @@ def read(fn):
         program = json.loads(f.readline()[12:])
         people = json.loads(f.readline()[11:])
 
+    try:
+        con_tz = ZoneInfo(config.get('convention', 'timezone'))
+    except config.NoSectionError as e:
+        con_tz = None
+    except config.NoOptionError as e:
+        con_tz = None
+
     # people_by_id = dict(map(lambda p: (p['id'], p), people))
 
     # print(program[0])
@@ -54,7 +62,7 @@ def read(fn):
             moderators = []
         date =  datetime.fromisoformat(p['datetime'][:-5])
 
-        date = date.replace(tzinfo=timezone.utc).astimezone(tz=None)
+        date = date.replace(tzinfo=timezone.utc).astimezone(tz=con_tz)
         new_p = {
             'sessionid': p['id'],
             'room': p['loc'][0],

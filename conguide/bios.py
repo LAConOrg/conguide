@@ -271,7 +271,7 @@ def main(args):
                 write(outfunc(args.outfile), participants)
             else:
                 try:
-                    write(outfunc(config.get('output files ' + mode, 'bios')),
+                    write(outfunc(f"{config.get('output directory', 'directory', '.')}/{config.get('output files ' + mode, 'bios')}"),
                           participants)
                 except config.NoOptionError:
                     pass
